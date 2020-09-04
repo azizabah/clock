@@ -10,6 +10,7 @@ cloud:
     bindings:
       temporalEvents:
         binder: rabbit
+
 clusterName: clockCluster
 
 ---
@@ -20,7 +21,7 @@ spring:
     port: 5672
     username: guest
     password: guest
-schedule: 0 0/1 * * * * # publish ever minute
+schedule: 0/5 * * * * * # publish ever 5 seconds
 
 ---
 spring:
@@ -31,10 +32,10 @@ spring:
     username: ${cloud.services.rabbitmq.connection.username}
     password: ${cloud.services.rabbitmq.connection.password}
     virtual-host: ${cloud.services.rabbitmq.connection.virtualhost}
-schedule: 0 0/15 * * * * # publish ever 15 minutes
 # see https://docs.pivotal.io/pivotalcf/2-0/buildpacks/java/configuring-service-connections/spring-service-bindings.html#properties
+schedule: 0 0/15 * * * * # publish ever 15 minutes
 
 ---
 spring:
   profiles: test
-schedule: 0 0/1 * * * * # publish ever minute starting at the top of the hour
+schedule: 0/1 * * * * * # publish ever 1 seconds starting at the top of the minute

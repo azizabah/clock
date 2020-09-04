@@ -1,8 +1,8 @@
 package net.malevy.clock.publishing;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.malevy.clock.time.TemporalEvent;
+import io.cloudevents.json.Json;
+import io.cloudevents.v1.CloudEventImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -20,10 +20,9 @@ public class Publisher {
         this.source = source;
     }
 
-    public void publish(TemporalEvent temporalEvent) throws JsonProcessingException {
+    public void publish(CloudEventImpl<Object> cloudEvent) throws JsonProcessingException {
 
-        final ObjectMapper mapper = new ObjectMapper();
-        String serializedValue = mapper.writeValueAsString(temporalEvent);
+        String serializedValue = Json.encode(cloudEvent);
 
         Message<String> message = MessageBuilder
                 .withPayload(serializedValue)

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -11,14 +12,18 @@ import java.util.Locale;
 public class TemporalEvent {
 
     @JsonIgnore
-    private final LocalDateTime moment;
+    private final ZonedDateTime moment;
 
     @JsonIgnore
     private static DateTimeFormatter dateFormat = DateTimeFormatter.ISO_LOCAL_DATE;
 
-    public TemporalEvent(LocalDateTime moment) {
+    public TemporalEvent(ZonedDateTime moment) {
+
         this.moment = moment;
     }
+
+    @JsonIgnore
+    public ZonedDateTime getMoment() { return this.moment; }
 
     @JsonProperty("date")
     public String getDate() { return moment.format(dateFormat); }
@@ -40,6 +45,9 @@ public class TemporalEvent {
 
     @JsonProperty("minute")
     public int getMinute() { return moment.getMinute(); }
+
+    @JsonProperty("Timezone")
+    public String getTimeZone() {return moment.getZone().getDisplayName(TextStyle.FULL, Locale.ENGLISH); }
 
     @JsonProperty("dayOfWeek")
     public String getDayOfWeekLabel() { return moment.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH).toLowerCase();}

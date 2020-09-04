@@ -1,6 +1,8 @@
 package net.malevy.clock.tasks;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.cloudevents.v1.CloudEventBuilder;
+import io.cloudevents.v1.CloudEventImpl;
 import net.malevy.clock.publishing.Publisher;
 import net.malevy.clock.time.DateTimeSupplier;
 import net.malevy.clock.time.TemporalEvent;
@@ -8,10 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.MediaType;
 import org.springframework.integration.leader.event.OnGrantedEvent;
 import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Component
 public class PublishTemporalEventTask {
@@ -38,8 +45,19 @@ public class PublishTemporalEventTask {
             return;
         }
 
-        final TemporalEvent eventToPublish = new TemporalEvent(this.dateTimeSupplier.now());
-        this.publisher.publish(eventToPublish);
+        final ZonedDateTime moment = this.dateTimeSupplier.now();
+        final TemporalEvent eventToPublish = new TemporalEvent(moment);
+
+        CloudEventImpl<Object> event = CloudEventBuilder.builder()
+                .withId(UUID.randomUUID().toString())
+                .withSource(URI.create("urn:clock"))
+                .withType("clock.temporal-event")
+                .withDataContentType(MediaType.APPLICATION_JSON.toString())
+                .withTime(moment)
+                .withData(eventToPublish)
+                .build();
+
+        this.publisher.publish(event);
         logger.debug("temporal event published");
     }
 

@@ -1,0 +1,19 @@
+
+version: '3.8'
+services:
+  rabbit:
+    image: "rabbitmq:management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  clock-service:
+    build: .
+    image: clock-service:1
+    restart: always
+    depends_on:
+      - rabbit
+    environment:
+      spring.rabbitmq.host: rabbit
+      spring_profiles_active: local
+
